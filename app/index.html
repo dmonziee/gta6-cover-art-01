@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vice Cover Studio — GTA-style cover art maker</title>
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<header class="topbar">
+  <h1>VICE COVER STUDIO</h1>
+  <p>Your photo, a caption, a Vice City sunset — a GTA-style cover in a minute. Photos never leave this machine.</p>
+</header>
+<main class="app">
+  <aside class="controls">
+    <section class="group">
+      <h2>1 · Photos</h2>
+      <p class="hint">Tap a panel on the cover to pick it, drag its photo to move it, use the slider to zoom.</p>
+      <div class="panel-card" id="panel-1">
+        <h3>Panel 1 · hero</h3>
+        <label class="file">Your photo <input id="file-1" type="file" accept="image/*"></label>
+        <div class="row">
+          <button id="sample-pier-1" type="button">Pier sample</button>
+          <button id="sample-boulevard-1" type="button">Boulevard sample</button>
+        </div>
+        <label>Zoom <input id="zoom-1" type="range" min="1" max="3" step="0.05" value="1"></label>
+        <button id="center-1" type="button">Centre photo</button>
+      </div>
+      <div class="panel-card" id="panel-2">
+        <h3>Panel 2</h3>
+        <label class="file">Your photo <input id="file-2" type="file" accept="image/*"></label>
+        <div class="row">
+          <button id="sample-pier-2" type="button">Pier sample</button>
+          <button id="sample-boulevard-2" type="button">Boulevard sample</button>
+        </div>
+        <label>Zoom <input id="zoom-2" type="range" min="1" max="3" step="0.05" value="1"></label>
+        <button id="center-2" type="button">Centre photo</button>
+      </div>
+      <div class="panel-card" id="panel-3">
+        <h3>Panel 3</h3>
+        <label class="file">Your photo <input id="file-3" type="file" accept="image/*"></label>
+        <div class="row">
+          <button id="sample-pier-3" type="button">Pier sample</button>
+          <button id="sample-boulevard-3" type="button">Boulevard sample</button>
+        </div>
+        <label>Zoom <input id="zoom-3" type="range" min="1" max="3" step="0.05" value="1"></label>
+        <button id="center-3" type="button">Centre photo</button>
+      </div>
+      <div class="panel-card" id="panel-4">
+        <h3>Panel 4</h3>
+        <label class="file">Your photo <input id="file-4" type="file" accept="image/*"></label>
+        <div class="row">
+          <button id="sample-pier-4" type="button">Pier sample</button>
+          <button id="sample-boulevard-4" type="button">Boulevard sample</button>
+        </div>
+        <label>Zoom <input id="zoom-4" type="range" min="1" max="3" step="0.05" value="1"></label>
+        <button id="center-4" type="button">Centre photo</button>
+      </div>
+      <button id="fill-all" type="button">Fill all panels with the active photo</button>
+    </section>
+    <section class="group">
+      <h2>2 · Caption</h2>
+      <label>Title <input id="title" type="text" maxlength="30" value="SUNSET HEIST"></label>
+      <label>Subtitle <input id="subtitle" type="text" maxlength="40" value="VICE CITY NIGHTS"></label>
+    </section>
+    <section class="group">
+      <h2>3 · Look</h2>
+      <label>Layout
+        <span class="seg">
+          <button data-layout="hero" type="button" class="on">Hero</button>
+          <button data-layout="grid" type="button">Grid</button>
+          <button data-layout="strips" type="button">Strips</button>
+        </span>
+      </label>
+      <label>Grade
+        <span class="seg">
+          <button data-grade="sunset" type="button" class="on">Sunset</button>
+          <button data-grade="neon" type="button">Neon</button>
+          <button data-grade="noir" type="button">Noir</button>
+        </span>
+      </label>
+      <label>Post size
+        <select id="size">
+          <option value="square" selected>Square · 1080 x 1080</option>
+          <option value="portrait">Portrait · 1080 x 1350</option>
+          <option value="wide">Wide · 1920 x 1080</option>
+        </select>
+      </label>
+    </section>
+  </aside>
+  <section class="stage">
+    <canvas id="poster" width="1080" height="1080" aria-label="The cover preview"></canvas>
+    <div class="exportbar">
+      <button id="export" type="button">Export PNG</button>
+      <p id="status" role="status">Loading the sample photos…</p>
+    </div>
+  </section>
+</main>
+<script type="module" src="./src/editor.js"></script>
+</body>
+</html>
