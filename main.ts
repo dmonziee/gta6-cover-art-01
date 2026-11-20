@@ -13,6 +13,7 @@
 // Round 3: the Poster layout, Dusk grade and title text effects live in
 // app/src/looks.js; main.ts still just copies whole trees, so no code
 // change is needed for them here.
+// Round 4: the Decorations system lives in app/src/decor.js and is copied the same way.
 
 import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';

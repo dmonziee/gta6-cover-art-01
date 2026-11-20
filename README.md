@@ -40,6 +40,25 @@ a PNG to share.
   The defaults — white outline, soft shadow, normal tracking — are the look
   the cover already had, so older covers paint exactly as before.
 
+## Decorations
+
+The cover can also wear procedural vector decorations, drawn with the 2D
+canvas API straight onto the panel area — over the photos, under the
+caption band, so the title always stays clean. Five families are painted:
+palm silhouettes rising from the bottom edge, a rayed setting sun in a top
+corner, a small flock of birds across the upper panels, a distant skyline
+with rounded towers and a ferris wheel, and flowing wave lines along the
+very bottom. Everything is deterministic: fixed positions and shapes, no
+randomness, so the same settings always paint the same cover.
+
+Three controls shape them. **Set** picks which families show: All, Palms
+(palms and waves only), Sky (sun, birds and skyline only), or None to turn
+them off. **Size** scales every decoration — Small, Medium or Large.
+**Bold** picks the weight: Soft is a light wash, Bold is near-opaque with
+heavier strokes. The defaults are All, Medium and Bold, so decorations are
+on from the first paint, and a saved cover without decoration settings
+still paints with those defaults.
+
 ## Run it
 
 Serve `app/` with any static file server and open `index.html`, for example:
