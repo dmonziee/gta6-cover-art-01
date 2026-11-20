@@ -10,6 +10,9 @@
 //
 // Outside the grader's container, MAKEFUN_OUTPUT_DIR stands in for /output:
 //   mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main.ts
+// Round 3: the Poster layout, Dusk grade and title text effects live in
+// app/src/looks.js; main.ts still just copies whole trees, so no code
+// change is needed for them here.
 
 import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';

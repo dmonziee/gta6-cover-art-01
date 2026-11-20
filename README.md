@@ -27,6 +27,19 @@ a PNG to share.
 - Export the cover as a PNG. Everything runs offline in a desktop browser from
   the app's own static files; photos are read on your machine and never uploaded.
 
+## Poster layout, Dusk grade and text effects
+
+- Poster layout: one big photo across the top, a full-width title band below
+  it, and panels 2–4 as a slim strip along the bottom — the classic one-sheet
+  poster, with all four panels still in play.
+- Dusk grade: a purple-to-orange twilight. The photos get a saturated, warm,
+  hue-shifted filter and a vertical wash — deep purple at the top fading to
+  burnt orange at the bottom — so it reads clearly apart from Sunset and Neon.
+- Text effects for the title lettering: outline colour (White, Black, Magenta,
+  Cyan), shadow (None, Soft, Strong) and letter tracking (Tight, Normal, Wide).
+  The defaults — white outline, soft shadow, normal tracking — are the look
+  the cover already had, so older covers paint exactly as before.
+
 ## Run it
 
 Serve `app/` with any static file server and open `index.html`, for example:
