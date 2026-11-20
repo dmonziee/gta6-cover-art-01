@@ -188,3 +188,10 @@ body.shot-cover #poster {
   box-shadow: none;
   background: #14101c;
 }
+
+/* 4 · Text effects: the outline row holds four short options, so its
+   buttons run a touch narrower than the layout and grade rows. */
+.fx-outline button { padding: 8px 4px; font-size: 13px; }
+.fx-row { margin-bottom: 8px; }
+.fx-row:last-child { margin-bottom: 2px; }
+.fx-note { margin: 2px 0 0; color: #b9a8c9; font-size: 12px; }
