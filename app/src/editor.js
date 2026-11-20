@@ -8,6 +8,7 @@
 // preview shows, at the chosen post size.
 
 import { SIZES, drawPoster, emptyPanel, focusCrop, panelRects } from './poster.js';
+import { DEFAULT_TEXT_FX, OUTLINE_CHOICES, SHADOW_CHOICES, TRACKING_CHOICES } from './looks.js';
 import { runShot } from './shots.js';
 
 const canvas = document.getElementById('poster');
@@ -21,6 +22,7 @@ const state = {
   sizeKey: 'square',
   layout: 'hero',
   grade: 'sunset',
+  textFx: { ...DEFAULT_TEXT_FX },
   title: 'SUNSET HEIST',
   subtitle: 'VICE CITY NIGHTS',
   panels: [emptyPanel(), emptyPanel(), emptyPanel(), emptyPanel()],
@@ -206,6 +208,22 @@ for (const button of document.querySelectorAll('[data-grade]')) {
   });
 }
 
+// ---- text effects: outline, shadow, tracking for the title lettering ------
+
+const FX_CHOICES = { outline: OUTLINE_CHOICES, shadow: SHADOW_CHOICES, tracking: TRACKING_CHOICES };
+for (const button of document.querySelectorAll('[data-fx]')) {
+  button.addEventListener('click', () => {
+    const key = button.dataset.fx;
+    const value = button.dataset.value;
+    if (!FX_CHOICES[key] || !FX_CHOICES[key].includes(value)) return;
+    state.textFx[key] = value;
+    for (const other of document.querySelectorAll(`[data-fx="${key}"]`)) {
+      other.classList.toggle('on', other === button);
+    }
+    redraw();
+  });
+}
+
 // ---- drag to pan the photo in a panel --------------------------------------
 
 function panelAt(clientX, clientY) {
@@ -287,6 +305,12 @@ if (shot) {
       state.grade = grade;
       for (const other of document.querySelectorAll('[data-grade]')) {
         other.classList.toggle('on', other.dataset.grade === grade);
+      }
+    },
+    setTextFx: (fx) => {
+      state.textFx = { ...state.textFx, ...fx };
+      for (const button of document.querySelectorAll('[data-fx]')) {
+        button.classList.toggle('on', state.textFx[button.dataset.fx] === button.dataset.value);
       }
     },
     loadSamples,

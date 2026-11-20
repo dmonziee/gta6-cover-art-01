@@ -7,6 +7,8 @@
 // comes from a fixed-seed generator, so the same state always paints the
 // same pixels.
 
+import { posterLayout, duskFilter, duskWash, titlePaint } from './looks.js';
+
 export const SIZES = {
   square: { w: 1080, h: 1080, label: '1080 x 1080' },
   portrait: { w: 1080, h: 1350, label: '1080 x 1350' },
@@ -15,6 +17,10 @@ export const SIZES = {
 
 export const LAYOUTS = ['hero', 'grid', 'strips'];
 export const GRADES = ['sunset', 'neon', 'noir'];
+// Round 3 adds the Poster layout and the Dusk grade by appending here,
+// so the original lists stay exactly as they were.
+LAYOUTS.push('poster');
+GRADES.push('dusk');
 
 /** A panel with no photo yet: zoom 1, centred. */
 export function emptyPanel() {
@@ -45,6 +51,7 @@ export function panelRects(size, layout) {
   const bandH = Math.round(h * 0.24);
   const area = { x: frame, y: frame, w: w - frame * 2, h: h - bandH - frame };
   const rects = [];
+  if (layout === 'poster') return posterLayout(size);
   if (layout === 'hero') {
     const leftW = Math.round(area.w * 0.58);
     rects.push({ x: area.x, y: area.y, w: leftW, h: area.h });
@@ -101,6 +108,7 @@ function gradeFilter(grade) {
   if (grade === 'sunset') return 'saturate(1.55) contrast(1.12) sepia(0.38) brightness(1.03)';
   if (grade === 'neon') return 'saturate(1.85) contrast(1.14) hue-rotate(-16deg) brightness(1.04)';
   if (grade === 'noir') return 'saturate(0.15) contrast(1.25) brightness(1.06)';
+  if (grade === 'dusk') return duskFilter();
   return 'none';
 }
 
@@ -138,6 +146,7 @@ function drawPanelPhoto(ctx, rect, panel, grade) {
 /** A colour wash over the whole panel area, on top of the graded photos. */
 function drawGrade(ctx, area, grade) {
   if (grade === 'noir') return;
+  if (grade === 'dusk') { duskWash(ctx, area); return; }
   ctx.save();
   if (grade === 'neon') {
     ctx.globalCompositeOperation = 'overlay';
@@ -263,6 +272,9 @@ export function drawPoster(canvas, state) {
 
   const { rects, frame, bandH } = panelRects(size, state.layout);
   const area = { x: frame, y: frame, w: w - frame * 2, h: h - bandH - frame };
+  // The Poster layout fills the whole poster, band in the middle, so its
+  // panel area runs to the foot instead of stopping above the band.
+  if (state.layout === 'poster') area.h = h - frame * 2;
   // White gutters: the panel area is white first, the panels sit in it.
   ctx.fillStyle = '#ffffff';
   ctx.fillRect(area.x, area.y, area.w, area.h);
@@ -273,6 +285,9 @@ export function drawPoster(canvas, state) {
 
   // Caption band: sunset gradient, skyline, sun, then the lettering.
   const band = { x: frame, y: h - bandH, w: w - frame * 2, h: bandH - frame };
+  // The Poster layout puts its title band in the middle of the poster,
+  // between the big photo and the strip — not at the foot.
+  if (state.layout === 'poster') band.y = posterLayout(size).bandY;
   const bg = ctx.createLinearGradient(0, band.y, 0, band.y + band.h);
   bg.addColorStop(0, '#2a0a3d');
   bg.addColorStop(0.55, '#a4136e');
@@ -286,10 +301,17 @@ export function drawPoster(canvas, state) {
   const cx = band.x + band.w / 2;
   if (title) {
     const { size, spacing } = fitTitle(ctx, title, band.w, band.h);
+    const paint = titlePaint(state.textFx);
+    const fxSpacing = Math.min(Math.round(spacing * paint.tracking), Math.round(size * 0.28));
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     try {
       ctx.letterSpacing = `${spacing}px`;
+    } catch {
+      // Older engines ignore letter spacing; the title still draws.
+    }
+    try {
+      ctx.letterSpacing = `${fxSpacing}px`;
     } catch {
       // Older engines ignore letter spacing; the title still draws.
     }
@@ -300,6 +322,11 @@ export function drawPoster(canvas, state) {
     ctx.shadowColor = 'rgba(8, 1, 18, 0.65)';
     ctx.shadowBlur = Math.round(size * 0.1);
     ctx.shadowOffsetY = Math.round(size * 0.05);
+    ctx.strokeStyle = paint.outline;
+    ctx.lineWidth = Math.max(4, Math.round(size * paint.outlineWidth));
+    ctx.shadowColor = paint.shadowColor;
+    ctx.shadowBlur = Math.round(size * paint.shadowBlur);
+    ctx.shadowOffsetY = Math.round(size * paint.shadowOffsetY);
     ctx.strokeText(title, cx, ty);
     ctx.fillStyle = '#ffffff';
     ctx.fillText(title, cx, ty);
