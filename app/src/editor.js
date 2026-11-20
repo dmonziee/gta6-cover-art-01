@@ -9,6 +9,7 @@
 
 import { SIZES, drawPoster, emptyPanel, focusCrop, panelRects } from './poster.js';
 import { DEFAULT_TEXT_FX, OUTLINE_CHOICES, SHADOW_CHOICES, TRACKING_CHOICES } from './looks.js';
+import { DEFAULT_DECOR, DECOR_SETS, DECOR_SIZES, DECOR_BOLD } from './decor.js';
 import { runShot } from './shots.js';
 
 const canvas = document.getElementById('poster');
@@ -23,6 +24,7 @@ const state = {
   layout: 'hero',
   grade: 'sunset',
   textFx: { ...DEFAULT_TEXT_FX },
+  decor: { ...DEFAULT_DECOR },
   title: 'SUNSET HEIST',
   subtitle: 'VICE CITY NIGHTS',
   panels: [emptyPanel(), emptyPanel(), emptyPanel(), emptyPanel()],
@@ -224,6 +226,35 @@ for (const button of document.querySelectorAll('[data-fx]')) {
   });
 }
 
+// ---- decorations: segmented controls for set / size / bold ----------------
+// Every decor button carries data-decor="set|size|bold" and a data-value.
+// A click validates the value against the matching choice list, updates
+// the matching field of state.decor, moves the `on` class to the clicked
+// button, and repaints the cover.
+const DECOR_LISTS = { set: DECOR_SETS, size: DECOR_SIZES, bold: DECOR_BOLD };
+function refreshDecorButtons() {
+  for (const btn of document.querySelectorAll('[data-decor]')) {
+    const group = btn.dataset.decor;
+    btn.classList.toggle('on', state.decor[group] === btn.dataset.value);
+  }
+}
+// The cover repaints through the live caption preview: nudging the title
+// field's input event makes the editor redraw with the new decor state.
+function nudgePaint() {
+  const title = document.getElementById('title');
+  if (title) title.dispatchEvent(new Event('input', { bubbles: true }));
+}
+for (const btn of document.querySelectorAll('[data-decor]')) {
+  btn.addEventListener('click', () => {
+    const group = btn.dataset.decor;
+    const choices = DECOR_LISTS[group];
+    if (!choices || !choices.includes(btn.dataset.value)) return;
+    state.decor[group] = btn.dataset.value;
+    refreshDecorButtons();
+    nudgePaint();
+  });
+}
+
 // ---- drag to pan the photo in a panel --------------------------------------
 
 function panelAt(clientX, clientY) {
@@ -312,6 +343,15 @@ if (shot) {
       for (const button of document.querySelectorAll('[data-fx]')) {
         button.classList.toggle('on', state.textFx[button.dataset.fx] === button.dataset.value);
       }
+    },
+    setDecor(partial) {
+      if (partial && typeof partial === 'object') {
+        for (const key of ['set', 'size', 'bold']) {
+          if (partial[key] !== undefined) state.decor[key] = partial[key];
+        }
+      }
+      refreshDecorButtons();
+      nudgePaint();
     },
     loadSamples,
     redraw,

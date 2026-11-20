@@ -8,6 +8,7 @@
 // same pixels.
 
 import { posterLayout, duskFilter, duskWash, titlePaint } from './looks.js';
+import { paintDecor } from './decor.js';
 
 export const SIZES = {
   square: { w: 1080, h: 1080, label: '1080 x 1080' },
@@ -282,6 +283,7 @@ export function drawPoster(canvas, state) {
     drawPanelPhoto(ctx, rects[i], state.panels[i] ?? emptyPanel(), state.grade);
   }
   drawGrade(ctx, area, state.grade);
+  paintDecor(ctx, area, state.decor);
 
   // Caption band: sunset gradient, skyline, sun, then the lettering.
   const band = { x: frame, y: h - bandH, w: w - frame * 2, h: bandH - frame };

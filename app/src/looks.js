@@ -1,4 +1,5 @@
 // Vice Cover Studio — the extra looks: Poster layout, Dusk grade, text effects.
+// The Decorations system lives in app/src/decor.js and paints over the panels after the grade wash.
 //
 // This module holds the round-3 additions so poster.js stays small: the
 // fourth layout (one big photo, a title band, a slim strip of the other

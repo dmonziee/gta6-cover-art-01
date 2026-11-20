@@ -8,6 +8,7 @@
 // the title text effects before painting. The page sets
 // window.__shotReady once painted, so a screenshot taken after it is never
 // half-drawn.
+// The shot URL also accepts decor-set, decor-size and decor-bold.
 
 export async function runShot(query, api) {
   const shot = query.get('shot');
@@ -24,6 +25,11 @@ export async function runShot(query, api) {
     query.get('caption') ?? 'SUNSET HEIST',
     query.get('sub') ?? 'VICE CITY NIGHTS',
   );
+  api.setDecor({
+    set: query.get('decor-set') ?? 'all',
+    size: query.get('decor-size') ?? 'medium',
+    bold: query.get('decor-bold') ?? 'bold',
+  });
   await api.loadSamples(query.get('photo') ?? 'pier', query.get('photo2') ?? 'boulevard');
   // The title font is a file under app/fonts: wait for it before painting,
   // or the lettering falls back to a system font in the screenshot.
