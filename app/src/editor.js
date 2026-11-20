@@ -1,13 +1,13 @@
 // Vice Cover Studio — the editor wiring.
 //
-// Holds the poster state, connects every control to it, and redraws the
+// Holds the poster state, connects every control to it, and repaints the
 // canvas on every change. Photos come from the person's own files (read on
 // this machine, never uploaded) or from the two free sample photos shipped
 // under app/samples/. Dragging on the preview pans the photo in the panel
 // under the pointer; the zoom slider zooms it. Export writes the PNG the
 // preview shows, at the chosen post size.
 
-import { SIZES, drawPoster, emptyPanel, panelRects } from './poster.js';
+import { SIZES, drawPoster, emptyPanel, focusCrop, panelRects } from './poster.js';
 import { runShot } from './shots.js';
 
 const canvas = document.getElementById('poster');
@@ -60,14 +60,36 @@ async function setSample(panelIndex, name) {
   redraw();
 }
 
-/** Loads every panel from the samples: panel 1 gets `first`, the rest `rest`. */
-async function loadSamples(first, rest) {
+/**
+ * The opening spread: the two samples alternate across the four panels,
+ * and every panel frames a different part of its photo — a face here, a
+ * detail there — so no two panels ever look like the same shot twice.
+ * The crops are worked out from the panel rectangles in force, so the
+ * same spread fits the hero, grid and strips layouts at any post size.
+ *
+ * Focus points are fractions of each photo: pier is the man fishing
+ * (face upper-left, rod and reel lower-right), boulevard is the woman by
+ * the red car (face upper-middle, car door lower-left).
+ */
+const OPENING_CROPS = [
+  { zoom: 1.35, fx: 0.37, fy: 0.22, ax: 0.5, ay: 0.42 },
+  { zoom: 1.6, fx: 0.56, fy: 0.24, ax: 0.5, ay: 0.4 },
+  { zoom: 1.85, fx: 0.8, fy: 0.72, ax: 0.5, ay: 0.55 },
+  { zoom: 1.9, fx: 0.24, fy: 0.8, ax: 0.5, ay: 0.55 },
+];
+
+/** Loads the opening spread: panels 1 and 3 get `first`, 2 and 4 `second`. */
+async function loadSamples(first, second) {
   const a = await loadImage(`samples/${first}.jpg`);
-  const b = await loadImage(`samples/${rest}.jpg`);
-  state.panels[0] = { img: a, zoom: 1.05, ox: 0, oy: 0 };
-  state.panels[1] = { img: b, zoom: 1.2, ox: 0, oy: -20 };
-  state.panels[2] = { img: b, zoom: 1.25, ox: 60, oy: 0 };
-  state.panels[3] = { img: a, zoom: 1.15, ox: 0, oy: -10 };
+  const b = await loadImage(`samples/${second}.jpg`);
+  const size = SIZES[state.sizeKey];
+  const { rects } = panelRects(size, state.layout);
+  const photos = [a, b, a, b];
+  for (let i = 0; i < 4; i++) {
+    const crop = OPENING_CROPS[i];
+    const placed = focusCrop(rects[i], photos[i], crop.zoom, crop.fx, crop.fy, crop.ax, crop.ay);
+    state.panels[i] = { img: photos[i], ...placed };
+  }
   redraw();
 }
 
@@ -119,16 +141,32 @@ for (let i = 0; i < 4; i++) {
   });
 }
 
+/**
+ * Fill-all crops: four different framings of one photo — a wide view, a
+ * close face, a low detail and a side detail — so one photo fills four
+ * panels that each look like a different shot.
+ */
+const FILL_CROPS = [
+  { zoom: 1.25, fx: 0.5, fy: 0.35, ax: 0.5, ay: 0.45 },
+  { zoom: 1.6, fx: 0.35, fy: 0.25, ax: 0.5, ay: 0.4 },
+  { zoom: 1.9, fx: 0.68, fy: 0.72, ax: 0.5, ay: 0.55 },
+  { zoom: 1.45, fx: 0.72, fy: 0.55, ax: 0.5, ay: 0.5 },
+];
+
 document.getElementById('fill-all').addEventListener('click', () => {
   const source = state.panels[activePanel];
   if (!source.img) {
     setStatus('Load a photo into the active panel first, then fill all panels with it.');
     return;
   }
+  const size = SIZES[state.sizeKey];
+  const { rects } = panelRects(size, state.layout);
   for (let i = 0; i < 4; i++) {
-    state.panels[i] = { img: source.img, zoom: 1, ox: 0, oy: 0 };
+    const crop = FILL_CROPS[i];
+    const placed = focusCrop(rects[i], source.img, crop.zoom, crop.fx, crop.fy, crop.ax, crop.ay);
+    state.panels[i] = { img: source.img, ...placed };
   }
-  setStatus('All four panels now use the active panel’s photo — crop each one differently.');
+  setStatus('One photo now fills all four panels, each cropped differently — drag any panel to adjust it.');
   redraw();
 });
 
